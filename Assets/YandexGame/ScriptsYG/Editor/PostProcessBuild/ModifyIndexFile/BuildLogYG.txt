@@ -1,2 +1,2 @@
-Build path: D:/UNITY_PROJECTS/Unity/Projects2023/VoxelUpGitHub/Builds/VoxelUp_0.0.1
-Build number: 50
+Build path: D:/UNITY_PROJECTS/Unity/Projects2023/VoxelUpLTS/Builds/VoxelUp
+Build number: 54

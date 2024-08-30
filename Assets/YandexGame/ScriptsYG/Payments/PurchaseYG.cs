@@ -59,10 +59,78 @@ namespace YG
             if (priceCurrencyImage) priceCurrencyImage.Load(data.priceCurrencyImage);
         }
 
+
+
+        public GameObject panelAuth;
+        private YandexGame ygInstance;
+        private bool isWaitingForAuth = false;
+
+        public void BuyP()
+        {
+            YandexGame.BuyPayments(data.id); // data.id должен быть определён в вашем классе
+        }
+
         public void BuyPurchase()
         {
-            YandexGame.BuyPayments(data.id);
+                panelAuth.SetActive(false);
+                // Устанавливаем флаг ожидания авторизации
+                isWaitingForAuth = true;
+                // Игрок не авторизован, вызываем окно авторизации
+                ygInstance._OpenAuthDialog(); // Статический метод вызывается через имя класса
         }
+
+
+
+
+        void OnEnable()
+        {
+            YandexGame.GetDataEvent += OnAuthCompleted;
+        }
+
+        void OnDisable()
+        {
+            YandexGame.GetDataEvent -= OnAuthCompleted;
+        }
+
+        public void CloseAuthPanel()
+        {
+            panelAuth.SetActive(false);
+        }
+
+        public void OpenAuthPanel()
+        {
+            if (YandexGame.auth)
+            {
+                // Игрок уже авторизован, можно продолжить покупку
+                BuyP();
+            }
+            else
+
+                panelAuth.SetActive(true);
+        }
+
+
+        void OnAuthCompleted()
+        {
+            if (isWaitingForAuth)
+            {
+                isWaitingForAuth = false; // Сбрасываем флаг
+                if (YandexGame.auth)
+                {
+                   
+                    // Игрок успешно авторизовался, продолжаем покупку
+                    BuyP();
+                }
+                else
+                {
+                    Debug.LogWarning("Авторизация не удалась");
+                }
+            }
+        }
+
+
+
+
 
         private string Yan()
         {

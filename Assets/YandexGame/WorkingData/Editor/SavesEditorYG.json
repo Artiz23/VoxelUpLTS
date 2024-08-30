@@ -1,7 +1,7 @@
 {
-    "idSave": 482,
+    "idSave": 485,
     "isFirstSession": false,
-    "language": "en",
+    "language": "ru",
     "promptDone": false,
     "money": 1,
     "newPlayerName": "Hello!",
@@ -11,7 +11,7 @@
         false
     ],
     "coins": 0,
-    "highScoreData": 5,
+    "highScoreData": 0,
     "skinsUnlocked": [
         true,
         false,
