@@ -1,2 +1,0 @@
-Build path: D:/UNITY_PROJECTS/Unity/Projects2023/VoxelUpLTS/Builds/VoxelUp
-Build number: 54
