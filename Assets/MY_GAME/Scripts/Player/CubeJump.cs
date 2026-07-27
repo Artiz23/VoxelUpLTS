@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using DG.Tweening;
 
 public class CubeJump : MonoBehaviour
 {
@@ -59,6 +60,9 @@ public class CubeJump : MonoBehaviour
     private bool isSkuns = false;
     private PauseMenu pauseMenu;
     public bool canPlay = true;
+    
+    // Для отслеживания кликов мыши
+    private bool isMouseDown = false;
 
     void Start()
     {
@@ -228,9 +232,6 @@ public class CubeJump : MonoBehaviour
         }
 
 
-
-
-
         bool newIsOnCube = IsOnCube();
 
         canJumpDownR = !Physics.Raycast(rayPositionRight.position, Vector3.right, 2.0f,
@@ -239,22 +240,113 @@ public class CubeJump : MonoBehaviour
         canJumpDownL = !Physics.Raycast(rayPositionLeft.position, Vector3.left, 2.0f,
             ~(1 << LayerMask.NameToLayer("ignoreRayCast")));
 
-
-        // Debug.DrawRay(rayPosition.position, Vector3.back * 1.0f, Color.red);
-
-        // Debug.DrawRay(rayPositionRight.position, Vector3.right * 2.0f, Color.red);
-        // Debug.DrawRay(rayPositionLeft.position, Vector3.left * 2.0f, Color.red);
-
-
-        //AWSD/////////////////////////////
+        //МОБИЛЬНОЕ УПРАВЛЕНИЕ + МЫШЬ////////////////////////////////////////////////////////
         if (isMove == true && canPlay == true)
         {
-
             if (newIsOnCube && canMove)
             {
                 timeSinceLastCube = 0f;
 
+                // Обработка касаний для мобильного управления
+                if (Input.touchCount > 0)
+                {
+                    Touch touch = Input.GetTouch(0);
 
+                    switch (touch.phase)
+                    {
+                        case TouchPhase.Began:
+                            touchStartPos = touch.position;
+                            touchDown = true;
+                            break;
+
+                        case TouchPhase.Ended:
+                            if (touchDown)
+                            {
+                                touchEndPos = touch.position;
+                                Vector2 swipeDelta = touchEndPos - touchStartPos;
+
+                                // Проверяем, является ли жест свайпом
+                                if (swipeDelta.magnitude > swipeThreshold)
+                                {
+                                    // Определяем направление свайпа
+                                    if (Mathf.Abs(swipeDelta.x) > Mathf.Abs(swipeDelta.y))
+                                    {
+                                        // Горизонтальный свайп (влево/вправо)
+                                        if (swipeDelta.x < 0)
+                                        {
+                                            // Свайп влево
+                                            MoveLeft();
+                                        }
+                                        else
+                                        {
+                                            // Свайп вправо
+                                            MoveRight();
+                                        }
+                                    }
+                                    else
+                                    {
+                                        // Вертикальный свайп (вверх/вниз) - игнорируем
+                                        // Можно добавить логику для свайпа вниз, если нужно
+                                    }
+                                }
+                                else
+                                {
+                                    // Это тап (короткое касание) - движение вперед
+                                    MoveForward();
+                                }
+
+                                touchDown = false;
+                            }
+                            break;
+                    }
+                }
+                
+                // Обработка мыши (для тестирования в редакторе Unity)
+                // if (Input.GetMouseButtonDown(0))
+                // {
+                //     isMouseDown = true;
+                //     touchStartPos = Input.mousePosition;
+                // }
+                
+                // if (Input.GetMouseButtonUp(0) && isMouseDown)
+                // {
+                //     isMouseDown = false;
+                //     touchEndPos = Input.mousePosition;
+                //     Vector2 swipeDelta = touchEndPos - touchStartPos;
+                    
+                //     // Проверяем, является ли жест свайпом
+                //     if (swipeDelta.magnitude > swipeThreshold)
+                //     {
+                //         // Определяем направление свайпа
+                //         if (Mathf.Abs(swipeDelta.x) > Mathf.Abs(swipeDelta.y))
+                //         {
+                //             // Горизонтальный свайп (влево/вправо)
+                //             if (swipeDelta.x < 0)
+                //             {
+                //                 // Свайп влево
+                //                 MoveLeft();
+                //             }
+                //             else
+                //             {
+                //                 // Свайп вправо
+                //                 MoveRight();
+                //             }
+                //         }
+                //         else
+                //         {
+                //             // Вертикальный свайп (вверх/вниз) - игнорируем
+                //             // Можно добавить логику для свайпа вниз, если нужно
+                //         }
+                //     }
+                //     else
+                //     {
+                //         // Это клик (короткое нажатие) - движение вперед
+                //         MoveForward();
+                //     }
+                // }
+
+                // -------------------- УПРАВЛЕНИЕ С КЛАВИАТУРЫ (ЗАКОММЕНТИРОВАНО) --------------------
+                /*
                 if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow))
                 {
                     if (gameStarted == false)
@@ -262,9 +354,6 @@ public class CubeJump : MonoBehaviour
                         startMenu.StartGame();
                         gameStarted = true;
                     }
-
-
-
 
                     _randomCube.CreateRandomCube();
 
@@ -277,17 +366,13 @@ public class CubeJump : MonoBehaviour
                         targetPosition += new Vector3(-2.0f, 1.0f, 0);
                     }
 
-
-
                     shouldRotate = true;
-
 
                     if (isBottleWater == true)
                     {
                         rotationAxis = Vector3.forward;
                         rotationAmount = -180f;
                         SetNewTargetRotation();
-
                     }
                     else
                     {
@@ -298,7 +383,6 @@ public class CubeJump : MonoBehaviour
                         animator.SetTrigger("Jump");
                     }
 
-
                     if (isHat == true)
                     {
                         StartCoroutine(ToggleActive());
@@ -308,9 +392,7 @@ public class CubeJump : MonoBehaviour
                     {
                         ToggleActiveSkuns();
                     }
-
                 }
-
                 else if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow))
                 {
                     if (gameStarted == false)
@@ -318,8 +400,6 @@ public class CubeJump : MonoBehaviour
                         startMenu.StartGame();
                         gameStarted = true;
                     }
-
-
 
                     _randomCube.CreateRandomCube();
                     if (canJumpDownR == true)
@@ -331,18 +411,13 @@ public class CubeJump : MonoBehaviour
                         targetPosition += new Vector3(2.0f, 1.0f, 0);
                     }
 
-
-
-
                     shouldRotate = true;
-
 
                     if (isBottleWater == true)
                     {
                         rotationAxis = Vector3.forward;
                         rotationAmount = 180f;
                         SetNewTargetRotation();
-
                     }
                     else
                     {
@@ -353,8 +428,6 @@ public class CubeJump : MonoBehaviour
                         animator.SetTrigger("Jump");
                     }
 
-
-
                     if (isHat == true)
                     {
                         StartCoroutine(ToggleActive());
@@ -363,12 +436,9 @@ public class CubeJump : MonoBehaviour
                     {
                         ToggleActiveSkuns();
                     }
-
                 }
-
                 else if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow))
                 {
-
                     if (gameStarted == false)
                     {
                         startMenu.StartGame();
@@ -378,28 +448,21 @@ public class CubeJump : MonoBehaviour
                     targetPosition += new Vector3(0, -1.0f, -2.0f);
                     shouldRotate = true;
 
-
-
-
                     if (isBottleWater == true)
                     {
                         rotationAxis = Vector3.right;
                         rotationAmount = 180f;
                         SetNewTargetRotation();
-
                     }
                     else
                     {
                         desiredRotation = new Vector3(0, 180, 0);
                     }
 
-
                     if (isBottleWater == false)
                     {
                         animator.SetTrigger("Jump");
                     }
-
-
 
                     if (isHat == true)
                     {
@@ -409,14 +472,9 @@ public class CubeJump : MonoBehaviour
                     {
                         ToggleActiveSkuns();
                     }
-
                 }
-
-
-                // Перемещение вперед
                 else if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow))
                 {
-
                     _randomCube.CreateRandomCube();
 
                     if (gameStarted == false)
@@ -425,10 +483,8 @@ public class CubeJump : MonoBehaviour
                         gameStarted = true;
                     }
 
-
                     targetPosition += new Vector3(0, 1.0f, 2.0f);
                     shouldRotate = true;
-
 
                     if (isBottleWater == true)
                     {
@@ -451,20 +507,15 @@ public class CubeJump : MonoBehaviour
                         StartCoroutine(ToggleActive());
                     }
 
-
-
                     if (isSkuns == true)
                     {
                         ToggleActiveSkuns();
                     }
-
-
-
                 }
-
+                */
+                // -------------------- КОНЕЦ ЗАКОММЕНТИРОВАННОГО УПРАВЛЕНИЯ С КЛАВИАТУРЫ --------------------
             }
         }
-
 
         if (isMove == true)
         {
@@ -476,22 +527,154 @@ public class CubeJump : MonoBehaviour
             {
                 timeSinceLastCube += Time.deltaTime;
 
-
                 if (timeSinceLastCube >= 0.1f && playerDeath.isDead == false)
                 {
                     Fall();
                 }
             }
-
-            transform.position = Vector3.Lerp(transform.position, targetPosition, moveSpeed * Time.deltaTime);
+               
+                float speed = 40.0f; // Экспериментируй: 10, 15, 20, 25
+                transform.position = Vector3.Lerp(transform.position, targetPosition, speed * Time.deltaTime);
+            // transform.position = Vector3.Lerp(transform.position, targetPosition, moveSpeed * Time.deltaTime);
         }
-
-
 
         if (isBottleWater == false)
         {
             childToRotate.localRotation = Quaternion.Slerp(childToRotate.localRotation,
                 Quaternion.Euler(desiredRotation), Time.deltaTime * rotationSpeed);
+        }
+    }
+
+    // Методы для мобильного управления
+    void MoveLeft()
+    {
+        if (gameStarted == false)
+        {
+            startMenu.StartGame();
+            gameStarted = true;
+        }
+
+        _randomCube.CreateRandomCube();
+
+        if (canJumpDownL == true)
+        {
+            targetPosition += new Vector3(-2.0f, -1.0f, 0);
+        }
+        else
+        {
+            targetPosition += new Vector3(-2.0f, 1.0f, 0);
+        }
+
+        shouldRotate = true;
+
+        if (isBottleWater == true)
+        {
+            rotationAxis = Vector3.forward;
+            rotationAmount = -180f;
+            SetNewTargetRotation();
+        }
+        else
+        {
+            desiredRotation = new Vector3(0, -90, 0);
+        }
+        if (isBottleWater == false)
+        {
+            animator.SetTrigger("Jump");
+        }
+
+        if (isHat == true)
+        {
+            StartCoroutine(ToggleActive());
+        }
+
+        if (isSkuns == true)
+        {
+            ToggleActiveSkuns();
+        }
+    }
+
+    void MoveRight()
+    {
+        if (gameStarted == false)
+        {
+            startMenu.StartGame();
+            gameStarted = true;
+        }
+
+        _randomCube.CreateRandomCube();
+        if (canJumpDownR == true)
+        {
+            targetPosition += new Vector3(2.0f, -1.0f, 0);
+        }
+        else
+        {
+            targetPosition += new Vector3(2.0f, 1.0f, 0);
+        }
+
+        shouldRotate = true;
+
+        if (isBottleWater == true)
+        {
+            rotationAxis = Vector3.forward;
+            rotationAmount = 180f;
+            SetNewTargetRotation();
+        }
+        else
+        {
+            desiredRotation = new Vector3(0, 90, 0);
+        }
+        if (isBottleWater == false)
+        {
+            animator.SetTrigger("Jump");
+        }
+
+        if (isHat == true)
+        {
+            StartCoroutine(ToggleActive());
+        }
+        if (isSkuns == true)
+        {
+            ToggleActiveSkuns();
+        }
+    }
+
+    void MoveForward()
+    {
+        _randomCube.CreateRandomCube();
+
+        if (gameStarted == false)
+        {
+            startMenu.StartGame();
+            gameStarted = true;
+        }
+
+        targetPosition += new Vector3(0, 1.0f, 2.0f);
+        shouldRotate = true;
+
+        if (isBottleWater == true)
+        {
+            rotationAxis = Vector3.right;
+            rotationAmount = -180f;
+            SetNewTargetRotation();
+        }
+        else
+        {
+            desiredRotation = new Vector3(0, 0, 0);
+        }
+
+        if (isBottleWater == false)
+        {
+            animator.SetTrigger("Jump");
+        }
+
+        if (isHat == true)
+        {
+            StartCoroutine(ToggleActive());
+        }
+
+        if (isSkuns == true)
+        {
+            ToggleActiveSkuns();
         }
     }
 

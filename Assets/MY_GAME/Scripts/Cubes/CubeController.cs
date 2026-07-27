@@ -53,11 +53,11 @@ public class CubeController : MonoBehaviour
             Instantiate(thornsTrap[0], transform.position + offsetThorns, thornsTrap[0].transform.rotation);
         }
 
-        else if (valueRandom > fireScore && fireObject != null)
-        {
+        // else if (valueRandom > fireScore && fireObject != null)
+        // {
 
-            fireObject.SetActive(true);
-        }
+        //     fireObject.SetActive(true);
+        // }
     }
 
     //China Platform
