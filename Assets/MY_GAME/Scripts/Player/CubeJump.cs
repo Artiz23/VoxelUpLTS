@@ -346,7 +346,7 @@ public class CubeJump : MonoBehaviour
                 // }
 
                 // -------------------- УПРАВЛЕНИЕ С КЛАВИАТУРЫ (ЗАКОММЕНТИРОВАНО) --------------------
-                /*
+                
                 if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow))
                 {
                     if (gameStarted == false)
@@ -512,7 +512,7 @@ public class CubeJump : MonoBehaviour
                         ToggleActiveSkuns();
                     }
                 }
-                */
+                
                 // -------------------- КОНЕЦ ЗАКОММЕНТИРОВАННОГО УПРАВЛЕНИЯ С КЛАВИАТУРЫ --------------------
             }
         }

@@ -9,6 +9,7 @@ namespace VoxelArsenal
         public float speedPS;
         public float speedColider;
         public float high;
+        public float chanceRandom = 30f;
 
         public Transform tornadoCollider;
 
@@ -24,12 +25,67 @@ namespace VoxelArsenal
 
         private void Start()
         {
-            speedPS = 0.4f;
+            float score = ScoreManager.score;
+
+            if(score > 300)
+            {
+                speedColider = 15f;
+                speedPS = 1.5f;
+            }else if(score > 270)
+            {
+                speedColider = 13f;
+                speedPS = 1.3f;
+            }
+            else if(score > 240)
+            {
+                speedColider = 12f;
+                speedPS = 1.2f;
+            }
+            else if(score > 210)
+            {
+                speedColider = 11f;
+                speedPS = 1.1f;
+            }
+            else if(score > 180)
+            {
+                speedColider = 10f;
+                speedPS = 1.0f;
+            }
+            else if(score > 150)
+            {
+                speedColider = 9f;
+                speedPS = 0.9f;
+            }
+            else if(score > 120)
+            {
+                speedColider = 8f;
+                speedPS = 0.8f;
+            }
+            else if(score > 90)
+            {
+                speedColider = 7f;
+                speedPS = 0.7f;
+            }
+            else if(score > 50)
+            {
+                speedColider = 6f;
+                speedPS = 0.6f;
+            }else if(score > 20)
+            {
+                speedColider = 5f;
+                speedPS = 0.5f;
+            }
+            else
+            {
+                speedColider = 4f;
+                speedPS = 0.4f;
+            }
+
 
             var main = ps_Tornado.main;
             main.simulationSpeed = speedPS;
 
-            if (Random.Range(0f, 100f) <= 30f)
+            if (Random.Range(0f, 100f) <= chanceRandom)
             {
                 ps_Tornado.Play();
                 shouldLift = true;
