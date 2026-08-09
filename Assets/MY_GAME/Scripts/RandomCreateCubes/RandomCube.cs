@@ -131,6 +131,7 @@ public class RandomCube : MonoBehaviour
 
         if (createdCubes == 49)
         {
+            //check point
             newCube = Instantiate(cubePrefab[6], newPosition, Quaternion.identity);
             countFirstPrefab += 1;
             countCreateFake += 1;

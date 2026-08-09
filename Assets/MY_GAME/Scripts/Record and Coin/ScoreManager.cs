@@ -24,6 +24,10 @@ public class ScoreManager : MonoBehaviour
         if (ScoreText != null)
         {
             ScoreText.text = ((int)score).ToString();
+            if(score < 0)
+            {
+                ScoreText.text = "0";
+            }
         }
 
         if ((int)score > saveManager.highscore)
