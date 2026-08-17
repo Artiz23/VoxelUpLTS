@@ -12,10 +12,10 @@ public class CubeJump : MonoBehaviour
     public GameObject[] objectsHats;
     private int currentIndex = -1;
 
-
     public Transform childToRotateBottle;
     public float rotationSpeedBottle = 1.0f;
-    private Quaternion targetRotation;
+    private Quaternion startBottleRotation = Quaternion.identity;
+    private Quaternion targetRotation = Quaternion.identity;
     private bool isRotating = false;
     private Vector3 rotationAxis;
     private float rotationAmount;
@@ -52,7 +52,7 @@ public class CubeJump : MonoBehaviour
     private int layerMask;
     public bool canJumpDownR = false;
     public bool canJumpDownL = false;
-    public bool gameStarted = false;
+    public static bool gameStarted = false;
     private bool touchDown = false;
     public static bool isShop = false;
     private bool isBottleWater = false;
@@ -76,6 +76,7 @@ public class CubeJump : MonoBehaviour
         Physics.autoSimulation = true;
 
         targetRotation = childToRotate.rotation;
+        startBottleRotation = childToRotate.rotation;
 
         if (gameObject.name == "Default(Clone)")
         {
@@ -85,7 +86,6 @@ public class CubeJump : MonoBehaviour
         {
             isBottleWater = false;
         }
-
 
         if (gameObject.name == "Case1_Y1(Clone)")
         {
@@ -105,7 +105,6 @@ public class CubeJump : MonoBehaviour
             isSkuns = false;
         }
 
-
         isShop = false;
         StartCoroutine(WaitGameStart());
         pauseMenu = GameObject.Find("PauseMenu").GetComponent<PauseMenu>();
@@ -116,15 +115,11 @@ public class CubeJump : MonoBehaviour
         lastYPosition = transform.position.y;
         previousYPosition = Mathf.RoundToInt(transform.position.y);
 
-
         layerMask = 1 << layerToInclude;
-
         layerMask = ~layerMask;
-
 
         targetPosition = transform.position;
         animator = GetComponent<Animator>();
-
         soundManager = GetComponent<SoundManager>();
     }
 
@@ -142,7 +137,6 @@ public class CubeJump : MonoBehaviour
         yield return new WaitForSeconds(1f);
         pauseMenu.ActivePauseMenu();
     }
-
 
     public void RestartScene()
     {
@@ -162,13 +156,11 @@ public class CubeJump : MonoBehaviour
         playerDeath.Die();
     }
 
-
     private IEnumerator WaitGameStart()
     {
         yield return new WaitForSeconds(0.6f);
         isMove = true;
     }
-
 
     void SetNewTargetRotation()
     {
@@ -193,13 +185,11 @@ public class CubeJump : MonoBehaviour
         isRotating = true;
     }
 
-
-
     void Update()
     {
         if (isRotating)
         {
-            rotationProgress += rotationSpeedBottle * Time.deltaTime ;
+            rotationProgress += rotationSpeedBottle * Time.deltaTime;
 
             if (rotationProgress >= 1f)
             {
@@ -209,7 +199,6 @@ public class CubeJump : MonoBehaviour
 
             childToRotate.rotation = Quaternion.Slerp(childToRotate.rotation, targetRotation, rotationProgress);
         }
-
 
         //SCORE////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         int currentYPosition = Mathf.RoundToInt(transform.position.y);
@@ -223,14 +212,12 @@ public class CubeJump : MonoBehaviour
         previousYPosition = currentYPosition;
         ///////////////////////////////////////////////
 
-
         if (isFalling && !isFallingTriggered)
         {
             isFallingTriggered = true;
             StartCoroutine(EffectDead());
             StartCoroutine(DelayedPauseMenuActivation());
         }
-
 
         bool newIsOnCube = IsOnCube();
 
@@ -286,7 +273,6 @@ public class CubeJump : MonoBehaviour
                                     else
                                     {
                                         // Вертикальный свайп (вверх/вниз) - игнорируем
-                                        // Можно добавить логику для свайпа вниз, если нужно
                                     }
                                 }
                                 else
@@ -300,220 +286,25 @@ public class CubeJump : MonoBehaviour
                             break;
                     }
                 }
-                
-                // Обработка мыши (для тестирования в редакторе Unity)
-                // if (Input.GetMouseButtonDown(0))
-                // {
-                //     isMouseDown = true;
-                //     touchStartPos = Input.mousePosition;
-                // }
-                
-                // if (Input.GetMouseButtonUp(0) && isMouseDown)
-                // {
-                //     isMouseDown = false;
-                //     touchEndPos = Input.mousePosition;
-                //     Vector2 swipeDelta = touchEndPos - touchStartPos;
-                    
-                //     // Проверяем, является ли жест свайпом
-                //     if (swipeDelta.magnitude > swipeThreshold)
-                //     {
-                //         // Определяем направление свайпа
-                //         if (Mathf.Abs(swipeDelta.x) > Mathf.Abs(swipeDelta.y))
-                //         {
-                //             // Горизонтальный свайп (влево/вправо)
-                //             if (swipeDelta.x < 0)
-                //             {
-                //                 // Свайп влево
-                //                 MoveLeft();
-                //             }
-                //             else
-                //             {
-                //                 // Свайп вправо
-                //                 MoveRight();
-                //             }
-                //         }
-                //         else
-                //         {
-                //             // Вертикальный свайп (вверх/вниз) - игнорируем
-                //             // Можно добавить логику для свайпа вниз, если нужно
-                //         }
-                //     }
-                //     else
-                //     {
-                //         // Это клик (короткое нажатие) - движение вперед
-                //         MoveForward();
-                //     }
-                // }
 
-                // -------------------- УПРАВЛЕНИЕ С КЛАВИАТУРЫ (ЗАКОММЕНТИРОВАНО) --------------------
-                
+                // -------------------- УПРАВЛЕНИЕ С КЛАВИАТУРЫ --------------------
                 if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow))
                 {
-                    if (gameStarted == false)
-                    {
-                        startMenu.StartGame();
-                        gameStarted = true;
-                    }
-
-                    _randomCube.CreateRandomCube();
-
-                    if (canJumpDownL == true)
-                    {
-                        targetPosition += new Vector3(-2.0f, -1.0f, 0);
-                    }
-                    else
-                    {
-                        targetPosition += new Vector3(-2.0f, 1.0f, 0);
-                    }
-
-                    shouldRotate = true;
-
-                    if (isBottleWater == true)
-                    {
-                        rotationAxis = Vector3.forward;
-                        rotationAmount = -180f;
-                        SetNewTargetRotation();
-                    }
-                    else
-                    {
-                        desiredRotation = new Vector3(0, -90, 0);
-                    }
-                    if (isBottleWater == false)
-                    {
-                        animator.SetTrigger("Jump");
-                    }
-
-                    if (isHat == true)
-                    {
-                        StartCoroutine(ToggleActive());
-                    }
-
-                    if (isSkuns == true)
-                    {
-                        ToggleActiveSkuns();
-                    }
+                    MoveLeft();
                 }
                 else if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow))
                 {
-                    if (gameStarted == false)
-                    {
-                        startMenu.StartGame();
-                        gameStarted = true;
-                    }
-
-                    _randomCube.CreateRandomCube();
-                    if (canJumpDownR == true)
-                    {
-                        targetPosition += new Vector3(2.0f, -1.0f, 0);
-                    }
-                    else
-                    {
-                        targetPosition += new Vector3(2.0f, 1.0f, 0);
-                    }
-
-                    shouldRotate = true;
-
-                    if (isBottleWater == true)
-                    {
-                        rotationAxis = Vector3.forward;
-                        rotationAmount = 180f;
-                        SetNewTargetRotation();
-                    }
-                    else
-                    {
-                        desiredRotation = new Vector3(0, 90, 0);
-                    }
-                    if (isBottleWater == false)
-                    {
-                        animator.SetTrigger("Jump");
-                    }
-
-                    if (isHat == true)
-                    {
-                        StartCoroutine(ToggleActive());
-                    }
-                    if (isSkuns == true)
-                    {
-                        ToggleActiveSkuns();
-                    }
+                    MoveRight();
                 }
                 else if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow))
                 {
-                    if (gameStarted == false)
-                    {
-                        startMenu.StartGame();
-                        gameStarted = true;
-                    }
-
-                    targetPosition += new Vector3(0, -1.0f, -2.0f);
-                    shouldRotate = true;
-
-                    if (isBottleWater == true)
-                    {
-                        rotationAxis = Vector3.right;
-                        rotationAmount = 180f;
-                        SetNewTargetRotation();
-                    }
-                    else
-                    {
-                        desiredRotation = new Vector3(0, 180, 0);
-                    }
-
-                    if (isBottleWater == false)
-                    {
-                        animator.SetTrigger("Jump");
-                    }
-
-                    if (isHat == true)
-                    {
-                        StartCoroutine(ToggleActive());
-                    }
-                    if (isSkuns == true)
-                    {
-                        ToggleActiveSkuns();
-                    }
+                    MoveBackward();
                 }
                 else if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow))
                 {
-                    _randomCube.CreateRandomCube();
-
-                    if (gameStarted == false)
-                    {
-                        startMenu.StartGame();
-                        gameStarted = true;
-                    }
-
-                    targetPosition += new Vector3(0, 1.0f, 2.0f);
-                    shouldRotate = true;
-
-                    if (isBottleWater == true)
-                    {
-                        rotationAxis = Vector3.right;
-                        rotationAmount = -180f;
-                        SetNewTargetRotation();
-                    }
-                    else
-                    {
-                        desiredRotation = new Vector3(0, 0, 0);
-                    }
-
-                    if (isBottleWater == false)
-                    {
-                        animator.SetTrigger("Jump");
-                    }
-
-                    if (isHat == true)
-                    {
-                        StartCoroutine(ToggleActive());
-                    }
-
-                    if (isSkuns == true)
-                    {
-                        ToggleActiveSkuns();
-                    }
+                    MoveForward();
                 }
-                
-                // -------------------- КОНЕЦ ЗАКОММЕНТИРОВАННОГО УПРАВЛЕНИЯ С КЛАВИАТУРЫ --------------------
+                // -------------------- КОНЕЦ УПРАВЛЕНИЯ С КЛАВИАТУРЫ --------------------
             }
         }
 
@@ -532,10 +323,9 @@ public class CubeJump : MonoBehaviour
                     Fall();
                 }
             }
-               
-                float speed = 40.0f; // Экспериментируй: 10, 15, 20, 25
-                transform.position = Vector3.Lerp(transform.position, targetPosition, speed * Time.deltaTime);
-            // transform.position = Vector3.Lerp(transform.position, targetPosition, moveSpeed * Time.deltaTime);
+
+            float speed = 40.0f;
+            transform.position = Vector3.Lerp(transform.position, targetPosition, speed * Time.deltaTime);
         }
 
         if (isBottleWater == false)
@@ -545,7 +335,7 @@ public class CubeJump : MonoBehaviour
         }
     }
 
-    // Методы для мобильного управления
+    // Методы для управления
     void MoveLeft()
     {
         if (gameStarted == false)
@@ -678,12 +468,48 @@ public class CubeJump : MonoBehaviour
         }
     }
 
+    void MoveBackward()
+    {
+        if (gameStarted == false)
+        {
+            startMenu.StartGame();
+            gameStarted = true;
+        }
+
+        targetPosition += new Vector3(0, -1.0f, -2.0f);
+        shouldRotate = true;
+
+        if (isBottleWater == true)
+        {
+            rotationAxis = Vector3.right;
+            rotationAmount = 180f;
+            SetNewTargetRotation();
+        }
+        else
+        {
+            desiredRotation = new Vector3(0, 180, 0);
+        }
+
+        if (isBottleWater == false)
+        {
+            animator.SetTrigger("Jump");
+        }
+
+        if (isHat == true)
+        {
+            StartCoroutine(ToggleActive());
+        }
+        if (isSkuns == true)
+        {
+            ToggleActiveSkuns();
+        }
+    }
+
     public void Fall()
     {
         targetPosition += new Vector3(0, -fallSpeed * Time.deltaTime, 0);
         isFalling = true;
     }
-
 
     bool IsOnCube()
     {
@@ -694,7 +520,6 @@ public class CubeJump : MonoBehaviour
             ~ignoreRaycastLayer);
         bool hitLeft = Physics.Raycast(rayPositionLeft.position, Vector3.left, out RaycastHit hitLeftResult, 2.0f,
             ~ignoreRaycastLayer);
-
 
         if (hitBack && hitBackResult.collider.CompareTag("Cube"))
         {
@@ -724,7 +549,6 @@ public class CubeJump : MonoBehaviour
         return false;
     }
 
-
     private IEnumerator ToggleActive()
     {
         hatObject.SetActive(false);
@@ -733,6 +557,7 @@ public class CubeJump : MonoBehaviour
         particleSystemHat.Play();
         hatObject.SetActive(true);
     }
+
     private void ToggleActiveSkuns()
     {
         particleSystemSkuns.Play();

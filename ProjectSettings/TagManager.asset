@@ -31,6 +31,7 @@ TagManager:
   - SaveManager
   - ScoreManager
   - PayCoins
+  - BounceTrap
   layers:
   - Default
   - TransparentFX

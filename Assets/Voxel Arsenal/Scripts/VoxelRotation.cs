@@ -25,6 +25,9 @@ namespace VoxelArsenal
 
         private void Start()
         {
+            if (!CubeJump.gameStarted) return;
+            // ================================================
+
             float score = ScoreManager.score;
 
             if(score > 300)

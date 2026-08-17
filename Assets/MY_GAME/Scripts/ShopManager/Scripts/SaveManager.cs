@@ -23,6 +23,19 @@ public class SaveManager : MonoBehaviour
         Load();
     }
 
+    private void OnApplicationPause(bool pauseStatus)
+    {
+        if (pauseStatus)
+        {
+            Save();
+        }
+    }
+
+    private void OnApplicationQuit()
+    {
+        Save();
+    }
+
     public void Load()
     {
         if (File.Exists(Application.persistentDataPath + "/playerInfo.dat"))

@@ -22,11 +22,17 @@ public class PlayerDeath : MonoBehaviour
     {
         if (!isDead)
         {
+            CubeJump.gameStarted = false;
             cubeJump.canMove = false;
             soundManager.PlayDeathSound();
             isDead = true;
             animator.SetBool("Explode", true);
             explosionParticle.Play();
+
+            if (saveManager != null)
+            {
+                saveManager.Save();
+            }
         }
     }
 }

@@ -528,11 +528,16 @@ MonoBehaviour:
   coin: {fileID: 4557994521735889120, guid: 0f1819e603b19f642a6916c078f20162, type: 3}
   anim: {fileID: 0}
   particleSystems: {fileID: 0}
-  countFall: 5
   thornsTrap: []
   fireObject: {fileID: 7745011496078429759}
   chinaCube: {fileID: 0}
   audioSource: {fileID: 0}
+  countFall: 5
+  staticCloudPrefab: {fileID: 1769940861048386, guid: 767ae60d391f7c441b83e11f0ff0d040,
+    type: 3}
+  spawnChancePercent: 30
+  yOffsetMin: -0.5
+  yOffsetMax: 0.5
 --- !u!95 &4324539064669473782
 Animator:
   serializedVersion: 7
@@ -35431,6 +35436,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 167.728
+      objectReference: {fileID: 0}
+    - target: {fileID: 8831085440917991470, guid: cf61b55b450dc244c86656a72ad65ac7,
+        type: 3}
+      propertyPath: m_TagString
+      value: BounceTrap
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

@@ -11,8 +11,10 @@ public class CoinManager : MonoBehaviour
         {
             soundManager.PlayCoinSound();
 
-            SaveManager.instance.money += 1;
-            SaveManager.instance.Save();
+            if (SaveManager.instance != null)
+            {
+                SaveManager.instance.money += 1;
+            }
         }
     }
 }

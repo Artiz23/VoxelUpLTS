@@ -1,5 +1,6 @@
-using System.Collections;
 using UnityEngine;
+using Cysharp.Threading.Tasks;
+using System.Threading;
 
 public class CubeManager : MonoBehaviour
 {
@@ -7,18 +8,17 @@ public class CubeManager : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            StartCoroutine(FallAndDestroyCoroutine());
+            FallAndDestroyAsync(this.GetCancellationTokenOnDestroy()).Forget();
         }
     }
 
-    private IEnumerator FallAndDestroyCoroutine()
+    private async UniTaskVoid FallAndDestroyAsync(CancellationToken token)
     {
-        yield return new WaitForSeconds(0f);
+        await UniTask.Delay(System.TimeSpan.FromSeconds(0f), cancellationToken: token);
         Rigidbody rb = GetComponent<Rigidbody>();
         rb.isKinematic = false;
 
-        yield return new WaitForSeconds(0.5f);
+        await UniTask.Delay(System.TimeSpan.FromSeconds(0.5f), cancellationToken: token);
         Destroy(gameObject);
     }
 }
-

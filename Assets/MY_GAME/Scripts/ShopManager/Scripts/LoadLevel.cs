@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.SceneManagement;
-using System.Collections;
+using Cysharp.Threading.Tasks;
+using System.Threading;
 
 public class LoadLevel : MonoBehaviour
 {
@@ -10,38 +11,38 @@ public class LoadLevel : MonoBehaviour
 
     public void LoadLevelNumber(int sceneIndex)
     {
-        StartCoroutine(LoadSceneAsync(sceneIndex));
+        LoadSceneAsync(sceneIndex, this.GetCancellationTokenOnDestroy()).Forget();
         if (pauseMenu != null)
             pauseMenu.Resume();
     }
 
-    private IEnumerator LoadSceneAsync(int sceneIndex)
+    private async UniTaskVoid LoadSceneAsync(int sceneIndex, CancellationToken token)
     {
+        CubeJump.gameStarted = false;
+        
         loadingScreen.SetActive(true);
 
-        AsyncOperation asyncOperation = SceneManager.LoadSceneAsync(sceneIndex);
-        asyncOperation.allowSceneActivation = false;
+        var asyncOperation = SceneManager.LoadSceneAsync(sceneIndex);
+        
 
-        float elapsed = 0f;
+        asyncOperation.allowSceneActivation = false;
+        float startTime = Time.realtimeSinceStartup;
 
         while (!asyncOperation.isDone)
         {
-            float progress = Mathf.Clamp01(asyncOperation.progress / 0.9f);
+            float elapsed = Time.realtimeSinceStartup - startTime;
 
-            if (elapsed < fakeLoadingTime)
+            if (elapsed >= fakeLoadingTime && asyncOperation.progress >= 0.9f)
             {
-                elapsed += Time.deltaTime;
-            }
-            else
-            {
-                if (asyncOperation.progress >= 0.9f)
-                {
-                    asyncOperation.allowSceneActivation = true;
-                }
+                asyncOperation.allowSceneActivation = true; 
+                
+                break;
             }
 
-            yield return null;
+            await UniTask.Yield(token);
         }
+
+        await UniTask.WaitUntil(() => asyncOperation.isDone, cancellationToken: token);
 
         loadingScreen.SetActive(false);
     }

@@ -9,40 +9,54 @@ public class ScoreManager : MonoBehaviour
 
     public static float score;
     private SaveManager saveManager;
+    private int lastDisplayedScore = -1;
+    private int lastDisplayedHighScore = -1;
 
     void Start()
     {
-        saveManager = GameObject.FindWithTag("SaveManager").GetComponent<SaveManager>();
+        GameObject saveManagerObj = GameObject.FindWithTag("SaveManager");
+        if (saveManagerObj != null)
+        {
+            saveManager = saveManagerObj.GetComponent<SaveManager>();
+        }
 
         score = 0;
+        lastDisplayedScore = -1;
+        lastDisplayedHighScore = -1;
 
         UpdateHighScoreText();
     }
 
     void Update()
     {
-        if (ScoreText != null)
+        int currentScoreInt = (int)score;
+        if (currentScoreInt < 0)
         {
-            ScoreText.text = ((int)score).ToString();
-            if(score < 0)
+            currentScoreInt = 0;
+        }
+
+        if (currentScoreInt != lastDisplayedScore)
+        {
+            lastDisplayedScore = currentScoreInt;
+            if (ScoreText != null)
             {
-                ScoreText.text = "0";
+                ScoreText.text = currentScoreInt.ToString();
             }
         }
 
-        if ((int)score > saveManager.highscore)
+        if (saveManager != null && currentScoreInt > saveManager.highscore)
         {
-            saveManager.highscore = (int)score;
-            PlayerPrefs.SetInt("score", saveManager.highscore);
+            saveManager.highscore = currentScoreInt;
             UpdateHighScoreText();
         }
     }
 
     void UpdateHighScoreText()
     {
-        if (HighScoreText != null)
+        if (saveManager != null && HighScoreText != null && saveManager.highscore != lastDisplayedHighScore)
         {
-            HighScoreText.text = saveManager.highscore.ToString();
+            lastDisplayedHighScore = saveManager.highscore;
+            HighScoreText.text = lastDisplayedHighScore.ToString();
         }
     }
 }
